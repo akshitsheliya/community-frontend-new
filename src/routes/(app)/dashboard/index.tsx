@@ -1,0 +1,120 @@
+import * as React from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import {
+  Users,
+  TreePine,
+  UserCog,
+  Newspaper,
+  Image as ImageIcon,
+  Briefcase,
+  HeartHandshake,
+  GraduationCap,
+  Plane,
+  Sparkles,
+  Search,
+  Inbox
+} from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { joinRequestApi } from '@/lib/family-join-api'
+import { matcherApi } from '@/lib/family-matcher-api'
+
+export const Route = createFileRoute('/(app)/dashboard/')({
+  component: DashboardComponent,
+})
+
+function DashboardItem({ icon: Icon, label, onClick, badge }: { icon: any, label: string, onClick: () => void, badge?: string }) {
+  return (
+    <div 
+      onClick={onClick}
+      className="bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 aspect-square sm:aspect-auto sm:min-h-[140px]"
+    >
+      <div className="w-14 h-14 rounded-full bg-[#A3232815] flex items-center justify-center text-[#A32328] group-hover:scale-110 transition-transform duration-200 relative">
+        <Icon size={28} className="text-[#A32328]" />
+        {badge && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10 border border-white">
+            {badge}
+          </span>
+        )}
+      </div>
+      <span className="text-sm font-semibold text-gray-800 text-center line-clamp-2 leading-tight">
+        {label}
+      </span>
+    </div>
+  )
+}
+
+function DashboardComponent() {
+  const navigate = useNavigate()
+  
+  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+  const isAdmin = userData.is_community_admin === 1;
+
+  const { data: incomingRequests = [] } = useQuery({
+    queryKey: ['incoming-requests-count'],
+    queryFn: joinRequestApi.getIncoming,
+    refetchInterval: 60000
+  });
+  const pendingIncoming = incomingRequests.filter(r => r.status === 'pending').length;
+
+  const { data: matcherStats } = useQuery({
+    queryKey: ['matcher-stats-dashboard'],
+    queryFn: matcherApi.getStats,
+    enabled: isAdmin,
+    refetchInterval: 60000
+  });
+  const pendingSuggestions = matcherStats?.pending || 0;
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 pb-8">
+      
+      {/* Image Carousel/Banner - TOP */}
+      <div className="rounded-2xl overflow-hidden h-48 md:h-64 relative shadow-sm border border-gray-100">
+        <div className="absolute inset-0 bg-gradient-to-r from-theme to-theme-hover opacity-90" />
+        <img 
+          src="https://images.unsplash.com/photo-1511649475669-e288648b2339?q=80&w=1600&auto=format&fit=crop" 
+          alt="Community Banner" 
+          className="w-full h-full object-cover mix-blend-overlay"
+        />
+        <div className="absolute inset-0 flex flex-col justify-center p-6 md:p-8 text-center">
+          <h2 className="text-white text-2xl md:text-3xl font-bold mb-2">Welcome to Your Community</h2>
+          <p className="text-white/90 text-sm md:text-base max-w-lg mx-auto">Stay connected with members, get the latest updates, and participate in community events.</p>
+        </div>
+      </div>
+      
+      {/* Services Grid - Icon Cards (like mobile app) */}
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+        {isAdmin && (
+          <DashboardItem 
+            icon={Sparkles} 
+            label="AI Matches" 
+            onClick={() => navigate({ to: '/admin/suggestions' })} 
+            badge={pendingSuggestions > 0 ? pendingSuggestions.toString() : undefined}
+          />
+        )}
+        <DashboardItem icon={Users} label="Members" onClick={() => navigate({ to: '/members' })} />
+        <DashboardItem icon={TreePine} label="Family Tree" onClick={() => navigate({ to: '/family-tree' })} />
+        
+        <DashboardItem 
+          icon={Search} 
+          label="Find Family" 
+          onClick={() => navigate({ to: '/find-family' })}
+        />
+        <DashboardItem 
+          icon={Inbox} 
+          label="Family Requests" 
+          onClick={() => navigate({ to: '/family-requests' })}
+          badge={pendingIncoming > 0 ? pendingIncoming.toString() : undefined}
+        />
+        
+        <DashboardItem icon={UserCog} label="Committee" onClick={() => navigate({ to: '/committee' })} />
+        <DashboardItem icon={Newspaper} label="Notices" onClick={() => navigate({ to: '/notice-board' })} />
+        <DashboardItem icon={ImageIcon} label="Gallery" onClick={() => navigate({ to: '/gallery' })} />
+        <DashboardItem icon={Briefcase} label="Business" onClick={() => navigate({ to: '/business' })} />
+        <DashboardItem icon={HeartHandshake} label="Donors" onClick={() => navigate({ to: '/donors' })} />
+        <DashboardItem icon={GraduationCap} label="Marksheets" onClick={() => navigate({ to: '/marksheets' })} />
+        <DashboardItem icon={Plane} label="Abroad" onClick={() => navigate({ to: '/abroad-members' })} />
+      </div>
+      
+    </div>
+  )
+}

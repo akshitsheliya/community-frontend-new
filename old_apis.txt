@@ -1,0 +1,82 @@
+﻿abroadmember.ts: 
+
+    const response = await api.get(`/abroad`);
+    const response = await api.get(`/abroad/${abroad_uuid}`);
+    const response = await api.post(`/abroad`, formData, {
+    const response = await api.put(`/abroad/${abroad_uuid}`, formData, {
+    const response = await api.delete(`/abroad/${abroadUuid}`);
+Album.ts: 
+    const response = await api.get(`/albums`);
+    const response = await api.get(
+    const response = await api.post(`/photos/${album_uuid}`, formData, {
+    const response = await api.delete(`/albums/${album_uuid}`);
+    const response = await api.post(`/face-recognition/album/${album_uuid}`);
+    const response = await api.post(`/face/process-selfie`);
+allMarkSheet.ts: 
+  const { data } = await api.get(`/all-marksheets?${queryParams}`);
+api.ts: 
+AwardStudents.ts: 
+  const { data } = await api.get(`/award-eligible`, { params });
+    const response = await api.get(`/generate-pdf`, {
+Business.ts: 
+    const response = await api.get("/business", {
+    const response = await api.get(`/business/${uuid}`);
+    const response = await api.put(`/business/${uuid}`, formData, {
+    const response = await api.delete(`/business/${uuid}`);
+    const response = await api.get(`/business-categories`);
+change-community.ts: 
+committee-members.ts: 
+    const { data } = await api.get(`/committee`);
+    const { data } = await api.delete(`/committee/${member_uuid}`);
+Community.ts: 
+  return await authAPI.get(`/community`, { params });
+counts.ts: 
+  const { data } = await api.get(`/counts?year=${year}`);
+delete-account-users.ts: 
+  await api.delete(`/user`);
+Donor.ts: 
+  const { data } = await api.get(`/donors`, { params });
+  const { data } = await api.delete(`donors/${donor_id}`);
+  const { data } = await api.get(`/members`, {
+  const { data } = await api.post(`/donors/${member_uuid}`, donorData, {
+  const { data } = await api.post("/donors", formData, {
+  const { data } = await api.put(`/donors/${id}`, formData, {
+family-members.ts: 
+  const { data } = await api.get(`/members-list/${family_uuid}`);
+  const { data } = await api.delete(`/member/${family_uuid}`);
+familyRepresentative.ts: 
+  const { data } = await api.get(`/representatives`);
+Language.ts: 
+Marksheet.ts: 
+      const { data } = await api.get(`/marksheets`);
+      const { data } = await api.post("/process-marksheet", formData, {
+      await api.delete(`/marksheets/${marksheet_uuid}`, {
+memberLlist.ts: 
+  const { data } = await api.get(`/families`, {
+  const { data } = await api.post("/members", formData);
+MyPhoto.ts: 
+  const { data } = await api.get(`/selfies`);
+  const { data } = await api.post(`/selfie/upload`, formData);
+  const { data } = await api.get(`/selfie/${selfieId}/album/${albumId}`);
+  const { data } = await api.delete(`/selfie/${selfieUuid}`);
+News.ts: 
+    const { data } = await api.get(`/news`, {
+    const { data } = await api.post(`/news`, formData);
+    const { data } = await api.get(`/news/${newsUuid}`);
+    const { data } = await api.delete(`/news/${newsUuid}`);
+    const { data } = await api.put(`/news/${newsUuid}`, formData);
+notification.ts: 
+  const { data } = await api.get("/notification");
+  const { data } = await api.put("/notification");
+  const { data } = await api.put(
+profileService.ts: 
+  const response = await api.post("/profile", formData);
+  const { data } = await api.put(`/user/${id}`, formData);
+surname.ts: 
+  const { data } = await api.get(`/surname`, {
+user.ts: 
+  const { data } = await api.get(`/user`);
+  const { data } = await api.get(`/unverified`);
+  const { data } = await api.put(`/approve/${id}`);
+
+
