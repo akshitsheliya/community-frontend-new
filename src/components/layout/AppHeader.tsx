@@ -3,6 +3,7 @@ import { Menu, Bell } from "lucide-react"
 import { useQuery } from '@tanstack/react-query'
 import { joinRequestApi } from '@/lib/family-join-api'
 import { matcherApi } from '@/lib/family-matcher-api'
+import { notificationApi } from '@/lib/notifications-api'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
@@ -32,18 +33,22 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
     refetchInterval: 60000
   });
   
+  // Fetch notifications count
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notifications-header'],
+    queryFn: notificationApi.getAll,
+    enabled: isAuthenticated,
+    refetchInterval: 30000
+  });
+  
   const pendingRequests = incomingRequests.filter(r => r.status === 'pending').length;
   const pendingSuggestions = stats?.pending || 0;
-  const totalNotifications = pendingRequests + (isAdmin ? pendingSuggestions : 0);
+  const unreadCount = notifications.filter(n => !n.notification_is_read).length;
+  
+  const totalNotifications = pendingRequests + (isAdmin ? pendingSuggestions : 0) + unreadCount;
   
   const handleBellClick = () => {
-    if (pendingRequests > 0) {
-      navigate({ to: '/family-requests' });
-    } else if (isAdmin && pendingSuggestions > 0) {
-      navigate({ to: '/admin/suggestions' });
-    } else {
-      toast.info('No new notifications');
-    }
+    navigate({ to: '/notifications' as any });
   };
   
   return (

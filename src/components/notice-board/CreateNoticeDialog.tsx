@@ -201,7 +201,7 @@ export function CreateNoticeDialog({ open, onClose, onSuccess }: Props) {
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={mutation.isPending}
+            disabled={mutation.isPending || !title.trim() || !description.trim()}
             className="flex-1 bg-[#A32328] hover:bg-[#8B1E22]"
           >
             {mutation.isPending ? 'Posting...' : 'Post Notice'}

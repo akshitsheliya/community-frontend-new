@@ -12,6 +12,7 @@ import {
 import { toast } from 'sonner';
 import { NoticeCard } from '@/components/notice-board/NoticeCard';
 import { CreateNoticeDialog } from '@/components/notice-board/CreateNoticeDialog';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/(app)/notice-board/')({
   component: NoticeBoardPage,
@@ -28,7 +29,7 @@ function NoticeBoardPage() {
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
   const isAdmin = userData.is_community_admin === 1;
   
-  const { data: notices = [], isLoading } = useQuery({
+  const { data: notices = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['notices'],
     queryFn: noticeBoardApi.getAll
   });
@@ -122,7 +123,9 @@ function NoticeBoardPage() {
       </div>
       
       {/* Notices List */}
-      {isLoading ? (
+      {isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4">

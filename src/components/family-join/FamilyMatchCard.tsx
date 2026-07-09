@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Home, User, Users, Sparkles } from 'lucide-react';
 import type { FamilyMatch } from '@/lib/family-join-api';
+import { getParentPrefix } from '@/lib/text-helpers';
 
 interface Props {
   family: FamilyMatch;
@@ -59,7 +60,7 @@ export function FamilyMatchCard({ family, onSelect }: Props) {
             </h3>
             {family.head_father_name && (
               <p className="text-xs text-gray-500">
-                s/o {family.head_father_name}
+                {getParentPrefix(family.head_gender)} {family.head_father_name}
               </p>
             )}
             <p className="text-xs text-gray-400 mt-1">

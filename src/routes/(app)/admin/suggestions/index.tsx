@@ -15,6 +15,7 @@ import {
 import { SuggestionCard } from '@/components/admin/SuggestionCard';
 import { StatsCard } from '@/components/admin/StatsCard';
 import { toast } from 'sonner';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/(app)/admin/suggestions/')({
   beforeLoad: () => {
@@ -42,7 +43,7 @@ function SuggestionsAdminPage() {
   });
   
   // Fetch suggestions
-  const { data: suggestions = [], isLoading } = useQuery({
+  const { data: suggestions = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['matcher-suggestions', status, filter],
     queryFn: () => matcherApi.getSuggestions({
       status,
@@ -206,7 +207,9 @@ function SuggestionsAdminPage() {
       </div>
       
       {/* Suggestions List */}
-      {isLoading ? (
+      {isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4">

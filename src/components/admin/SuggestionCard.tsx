@@ -11,6 +11,7 @@ import {
   Info
 } from 'lucide-react';
 import type { MatchSuggestion } from '@/lib/family-matcher-api';
+import { getParentPrefix } from '@/lib/text-helpers';
 
 interface Props {
   suggestion: MatchSuggestion;
@@ -94,7 +95,7 @@ export function SuggestionCard({
               </p>
               {suggestion.member_a_father_name && (
                 <p className="text-xs text-gray-500">
-                  s/o {suggestion.member_a_father_name}
+                  {getParentPrefix(suggestion.member_a_gender)} {suggestion.member_a_father_name}
                 </p>
               )}
               <p className="text-xs text-gray-400">
@@ -130,7 +131,7 @@ export function SuggestionCard({
               </p>
               {suggestion.member_b_father_name && (
                 <p className="text-xs text-gray-500">
-                  s/o {suggestion.member_b_father_name}
+                  {getParentPrefix(suggestion.member_b_gender)} {suggestion.member_b_father_name}
                 </p>
               )}
               <p className="text-xs text-gray-400">

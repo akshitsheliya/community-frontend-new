@@ -16,6 +16,7 @@ import {
 import { toast } from 'sonner';
 import { FamilyMatchCard } from '@/components/family-join/FamilyMatchCard';
 import { JoinRequestDialog } from '@/components/family-join/JoinRequestDialog';
+import { getParentPrefix } from '@/lib/text-helpers';
 
 export const Route = createFileRoute('/(app)/find-family/')({
   validateSearch: (search) => ({
@@ -84,7 +85,7 @@ function FindFamilyPage() {
         <p className="text-sm opacity-90">
           Based on your profile: <span className="font-semibold">{userData.first_name} {userData.surname}</span>
           {userData.father_name && (
-            <span> (s/o {userData.father_name})</span>
+            <span> ({getParentPrefix(userData.gender)} {userData.father_name})</span>
           )}
         </p>
         <p className="text-xs opacity-75 mt-1">

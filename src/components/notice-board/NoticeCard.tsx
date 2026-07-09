@@ -26,9 +26,6 @@ export function NoticeCard({ notice, isAdmin, onDelete, onEdit }: Props) {
   const config = getNoticeTypeConfig(notice.feed_type);
   
   const isLong = notice.feed_description && notice.feed_description.length > 200;
-  const displayDesc = expanded || !isLong 
-    ? notice.feed_description 
-    : notice.feed_description?.substring(0, 200) + '...';
   
   const timeAgo = notice.added_on 
     ? formatDistanceToNow(new Date(notice.added_on), { addSuffix: true })
@@ -104,8 +101,11 @@ export function NoticeCard({ notice, isAdmin, onDelete, onEdit }: Props) {
         {/* Description */}
         {notice.feed_description && (
           <>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-              {displayDesc}
+            <p className={`
+              text-sm text-gray-700 leading-relaxed whitespace-pre-wrap
+              ${!expanded ? 'line-clamp-3' : ''}
+            `}>
+              {notice.feed_description}
             </p>
             {isLong && (
               <button

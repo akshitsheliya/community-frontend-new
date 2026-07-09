@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoadingPage } from '@/components/ui/loading-page';
+import { getParentPrefix } from '@/lib/text-helpers';
 
 export const Route = createFileRoute('/(app)/family-requests/')({
   component: FamilyRequestsPage,
@@ -167,7 +168,7 @@ function RequestCard({ request, onApprove, onReject, isProcessing, readOnly }: a
             </p>
             {request.requester_father_name && (
               <p className="text-xs text-gray-500">
-                s/o {request.requester_father_name}
+                {getParentPrefix(request.requester_gender)} {request.requester_father_name}
               </p>
             )}
             <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">

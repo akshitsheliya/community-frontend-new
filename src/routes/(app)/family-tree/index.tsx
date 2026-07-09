@@ -18,6 +18,7 @@ import {
 import { FamilyMemberCard } from '@/components/family-tree/FamilyMemberCard';
 import { FamilyGroupSection } from '@/components/family-tree/FamilyGroupSection';
 import { AddRelationshipDialog } from '@/components/family-tree/AddRelationshipDialog';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/(app)/family-tree/')({
   component: FamilyTreePage,
@@ -33,7 +34,7 @@ function FamilyTreePage() {
   const userName = `${userData.first_name || 'You'} ${userData.surname || ''}`.trim();
   
   // Fetch family tree
-  const { data: tree, isLoading, refetch, isRefetching } = useQuery({
+  const { data: tree, isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ['family-tree', memberUuid],
     queryFn: () => familyGraphApi.getFamilyTree(memberUuid, 3),
     enabled: !!memberUuid
@@ -111,7 +112,9 @@ function FamilyTreePage() {
       )}
       
       {/* Content */}
-      {!isLoading && groups && (
+      {isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : !isLoading && groups && (
         <>
           {/* You (Center Member) */}
           <div>

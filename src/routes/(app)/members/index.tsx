@@ -11,7 +11,7 @@ import { MembersListSkeleton } from '@/components/members/MembersListSkeleton';
 import { EmptyMembersState } from '@/components/members/EmptyMembersState';
 import type { Member } from '@/types/api';
 import { UserPlus } from 'lucide-react';
-// import { useAuth } from '@/hooks/useAuth'; // Assuming useAuth exists or I will mock it temporarily if it doesn't
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/(app)/members/')({
   component: MembersListPage,
@@ -44,10 +44,12 @@ function MembersListPage() {
     } else if (activeFilter === 'Committee') {
       result = result.filter(m => m.is_committee_member === true || m.is_committee_member === 1);
     } else if (activeFilter === 'My Family') {
-      if (user?.family_uuid) {
+      if (user?.family_sr_id) {
+        result = result.filter(m => m.family_sr_id === user.family_sr_id);
+      } else if (user?.family_uuid) {
         result = result.filter(m => m.family_uuid === user.family_uuid);
       } else {
-        result = []; // If user has no family_uuid, show empty
+        result = []; // If user has no family_sr_id, show empty
       }
     }
 
@@ -108,11 +110,8 @@ function MembersListPage() {
         {isLoading ? (
           <MembersListSkeleton />
         ) : isError ? (
-          <div className="text-center py-12">
-            <p className="text-red-500 mb-2">Failed to load members.</p>
-            <button onClick={() => refetch()} className="px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-medium">
-              Retry
-            </button>
+          <div className="py-8">
+            <ErrorState onRetry={() => refetch()} />
           </div>
         ) : filteredMembers.length === 0 ? (
           <EmptyMembersState 

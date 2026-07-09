@@ -4,7 +4,6 @@ import {
   Shield,
   ClipboardList,
   Phone,
-  Trash2,
   LogOut,
   User,
   Pencil,
@@ -121,6 +120,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
         <div className="bg-white text-black rounded-t-2xl -mt-4 relative p-2 pt-4 space-y-1 overflow-y-auto" 
              style={{ height: 'calc(100vh - 100px)' }}>
           
+          <SidebarItem icon={<User size={22} />} text="My Profile" onClick={() => navigateTo('/profile')} />
           <SidebarItem icon={<Settings size={22} />} text="Settings" onClick={() => navigateTo('/settings')} />
           <SidebarItem icon={<Shield size={22} />} text="Privacy Policy" onClick={() => navigateTo('/privacy-policy')} />
           <SidebarItem icon={<ClipboardList size={22} />} text="Terms & Conditions" onClick={() => navigateTo('/terms-conditions')} />
@@ -128,7 +128,6 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           
           <div className="my-3 border-t border-gray-100 mx-2" />
           
-          <SidebarItem icon={<Trash2 size={22} />} text="Delete Account" onClick={() => { /* open popup */ }} />
           <SidebarItem icon={<LogOut size={22} />} text="Log Out" onClick={handleLogout} />
           
           {userState?.is_community_admin === 1 && (
