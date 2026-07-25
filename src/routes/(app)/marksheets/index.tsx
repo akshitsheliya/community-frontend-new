@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   FileText, Plus, Search, Check, X, ArrowLeft, 
-  Award, Calendar, BookOpen, GraduationCap, Clock
+  Award, Calendar, BookOpen, GraduationCap, Clock, Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { UploadMarksheetDialog } from '@/components/marksheets/UploadMarksheetDialog';
