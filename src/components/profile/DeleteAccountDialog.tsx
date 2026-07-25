@@ -44,7 +44,7 @@ export function DeleteAccountDialog({ open, onClose }: Props) {
   
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-white text-gray-900 border-gray-200 shadow-2xl">
         <DialogHeader>
           <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-2">
             <AlertTriangle size={24} />

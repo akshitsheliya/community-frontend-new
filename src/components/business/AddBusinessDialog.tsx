@@ -100,7 +100,7 @@ export function AddBusinessDialog({ open, onClose }: Props) {
   
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg p-0 max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-lg p-0 max-h-[90vh] overflow-hidden flex flex-col bg-white text-gray-900 border-gray-200 shadow-2xl">
         <DialogHeader className="p-4 border-b border-gray-100">
           <DialogTitle>List Your Business</DialogTitle>
         </DialogHeader>

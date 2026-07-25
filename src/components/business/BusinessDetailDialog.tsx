@@ -40,7 +40,7 @@ export function BusinessDetailDialog({ business, open, onClose, currentMemberId 
   
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg p-0 max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-lg p-0 max-h-[90vh] overflow-hidden flex flex-col bg-white text-gray-900 border-gray-200 shadow-2xl">
         {/* Header Image / Icon */}
         <div className="relative h-48 bg-gradient-to-br from-[#A32328] to-[#8B1E22] flex items-center justify-center flex-shrink-0">
           {business.business_photo ? (
