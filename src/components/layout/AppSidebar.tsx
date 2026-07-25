@@ -7,11 +7,13 @@ import {
   LogOut,
   User,
   Pencil,
-  Sparkles
+  Sparkles,
+  Trash2
 } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { getUserData, logout } from "@/lib/auth"
 import { toast } from "sonner"
+import { DeleteAccountDialog } from "@/components/profile/DeleteAccountDialog"
 
 interface AppSidebarProps {
   isOpen: boolean
@@ -33,6 +35,7 @@ function SidebarItem({ icon, text, onClick }: { icon: React.ReactNode, text: str
 export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const navigate = useNavigate()
   const [userState, setUserState] = React.useState(getUserData())
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
 
   React.useEffect(() => {
     if (!userState && isOpen) {
@@ -56,10 +59,12 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const phoneNumber = userState?.phone_number || ""
 
   const handleLogout = () => {
-    onClose()
-    logout()
-    toast.success("Logged out successfully")
-    navigate({ to: "/login" })
+    if (window.confirm("Are you sure you want to log out?")) {
+      onClose()
+      logout()
+      toast.success("Logged out successfully")
+      navigate({ to: "/login" })
+    }
   }
 
   const navigateTo = (path: string) => {
@@ -125,6 +130,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           <SidebarItem icon={<Shield size={22} />} text="Privacy Policy" onClick={() => navigateTo('/privacy-policy')} />
           <SidebarItem icon={<ClipboardList size={22} />} text="Terms & Conditions" onClick={() => navigateTo('/terms-conditions')} />
           <SidebarItem icon={<Phone size={22} />} text="Helpline Call" onClick={() => navigateTo('/help')} />
+          <SidebarItem icon={<Trash2 size={22} />} text="Delete Account" onClick={() => setIsDeleteDialogOpen(true)} />
           
           <div className="my-3 border-t border-gray-100 mx-2" />
           
@@ -145,6 +151,8 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           )}
         </div>
       </div>
+
+      <DeleteAccountDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} />
     </>
   )
 }

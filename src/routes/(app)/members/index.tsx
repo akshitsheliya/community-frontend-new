@@ -44,12 +44,13 @@ function MembersListPage() {
     } else if (activeFilter === 'Committee') {
       result = result.filter(m => m.is_committee_member === true || m.is_committee_member === 1);
     } else if (activeFilter === 'My Family') {
-      if (user?.family_sr_id) {
-        result = result.filter(m => m.family_sr_id === user.family_sr_id);
-      } else if (user?.family_uuid) {
-        result = result.filter(m => m.family_uuid === user.family_uuid);
+      const resolvedFamilySrId = user?.family_sr_id || 
+        members.find(m => m.member_uuid === user?.member_uuid || m.phone_number === user?.phone_number)?.family_sr_id;
+        
+      if (resolvedFamilySrId) {
+        result = result.filter(m => m.family_sr_id === resolvedFamilySrId);
       } else {
-        result = []; // If user has no family_sr_id, show empty
+        result = []; // If we can't determine the user's family, show empty
       }
     }
 
