@@ -17,6 +17,21 @@ body {
   margin: 0;
 }
 
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+select {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #111827;
