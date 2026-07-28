@@ -9,9 +9,16 @@ export const Route = createFileRoute('/')({
         to: '/dashboard',
       })
     } else {
-      throw redirect({
-        to: '/login',
-      })
+      const stored = typeof window !== 'undefined' ? localStorage.getItem('communityData') : null
+      if (!stored) {
+        throw redirect({
+          to: '/community',
+        })
+      } else {
+        throw redirect({
+          to: '/login',
+        })
+      }
     }
   },
   component: IndexComponent,

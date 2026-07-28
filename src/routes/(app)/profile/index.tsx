@@ -27,6 +27,8 @@ import React from 'react';
 import { getParentPrefix } from '@/lib/text-helpers';
 import { ErrorState } from '@/components/ui/error-state';
 
+import { LogoutConfirmDialog } from '@/components/common/LogoutConfirmDialog';
+
 export const Route = createFileRoute('/(app)/profile/')({
   component: ProfilePage,
 });
@@ -35,6 +37,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const queryClient = useQueryClient();
   
   const { data: profile, isLoading, isError, refetch } = useQuery({
@@ -43,10 +46,7 @@ function ProfilePage() {
   });
   
   const handleLogout = () => {
-    if (!window.confirm('Are you sure you want to logout?')) return;
-    localStorage.clear();
-    sessionStorage.clear();
-    navigate({ to: '/login' });
+    setShowLogoutDialog(true);
   };
   
   if (isLoading) {
@@ -285,6 +285,11 @@ function ProfilePage() {
       <DeleteAccountDialog 
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
+      />
+
+      <LogoutConfirmDialog 
+        open={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
       />
     </div>
   );

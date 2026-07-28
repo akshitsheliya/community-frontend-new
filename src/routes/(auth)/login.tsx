@@ -24,6 +24,7 @@ function LoginComponent() {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = React.useState(false)
   const [communityUuid, setCommunityUuid] = React.useState<string | undefined>()
+  const [communityName, setCommunityName] = React.useState<string | undefined>()
 
   React.useEffect(() => {
     // Check if community is selected
@@ -33,10 +34,14 @@ function LoginComponent() {
         const parsed = JSON.parse(stored)
         if (parsed.community_uuid) {
           setCommunityUuid(parsed.community_uuid)
+          setCommunityName(parsed.community_name)
+          return
         }
       } catch (e) {}
     }
-  }, [])
+    // If no community is selected, redirect to select community first
+    navigate({ to: '/community' })
+  }, [navigate])
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -66,7 +71,13 @@ function LoginComponent() {
         toast.error(response.data.message || 'Failed to send OTP')
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'An error occurred while sending OTP')
+      const errorMsg = error.response?.data?.message || ''
+      if (errorMsg.includes('Create your profile') || errorMsg.includes('create_profile_first') || errorMsg.includes('કૃપા કરીને પહેલા પ્રોફાઇલ')) {
+        toast.info('Account profile incomplete. Redirecting to registration...')
+        navigate({ to: '/register', search: { phone: data.phone_number } })
+        return
+      }
+      toast.error(errorMsg || 'An error occurred while sending OTP')
     } finally {
       setIsLoading(false)
     }
@@ -75,6 +86,15 @@ function LoginComponent() {
   return (
     <AuthLayout>
       <div className="p-6 sm:p-8">
+        {communityName && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl flex items-center justify-between text-xs text-theme">
+            <span className="font-semibold truncate">Community: {communityName}</span>
+            <Link to="/community" className="ml-2 underline hover:text-theme-hover font-bold flex-shrink-0">
+              Change
+            </Link>
+          </div>
+        )}
+
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-semibold text-gray-900">Login to Your Account</h2>
           <p className="text-sm text-gray-500 mt-2">Enter your mobile number to receive OTP</p>
@@ -106,7 +126,7 @@ function LoginComponent() {
               Don't have an account? Register
             </Link>
             <Link to="/community" className="text-gray-500 hover:text-gray-900 transition-colors">
-              Select Community
+              Change Community
             </Link>
           </div>
         </form>

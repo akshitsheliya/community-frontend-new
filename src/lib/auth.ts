@@ -41,5 +41,7 @@ export const logout = (): void => {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_DATA_KEY);
-  localStorage.clear(); // To mirror the original frontend's handleLogout
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = '/community';
 };

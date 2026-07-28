@@ -11,7 +11,16 @@ import { authApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 
+type RegisterSearch = {
+  phone?: string
+}
+
 export const Route = createFileRoute('/(auth)/register')({
+  validateSearch: (search: Record<string, unknown>): RegisterSearch => {
+    return {
+      phone: search.phone as string | undefined,
+    }
+  },
   component: RegisterComponent,
 })
 
@@ -24,6 +33,7 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>
 
 function RegisterComponent() {
+  const { phone: initialPhone } = Route.useSearch()
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = React.useState(false)
   const [communityUuid, setCommunityUuid] = React.useState<string | undefined>()
@@ -43,6 +53,9 @@ function RegisterComponent() {
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      phone_number: initialPhone || '',
+    }
   })
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -63,9 +76,15 @@ function RegisterComponent() {
       
       if (response.data.success) {
         toast.success(response.data.message || 'OTP sent successfully')
-        // In a real app we would navigate to a register-otp page or similar
-        // navigate({ to: '/register-otp', search: { phone: data.phone_number } })
-        navigate({ to: '/login' })
+        // Store name details for profile creation after OTP verification
+        sessionStorage.setItem(`pending_reg_${data.phone_number}`, JSON.stringify({
+          first_name: data.first_name,
+          surname: data.surname,
+        }))
+        navigate({ 
+          to: '/login-otp', 
+          search: { phone: data.phone_number, mode: 'register' } 
+        })
       } else {
         toast.error(response.data.message || 'Failed to send OTP')
       }

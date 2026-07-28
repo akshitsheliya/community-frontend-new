@@ -58,7 +58,9 @@ export function JoinRequestDialog({ family, open, onClose, onSuccess }: Props) {
     onClose();
   };
   
-  const headInitials = `${family.head_first_name?.[0] || ''}${family.head_surname?.[0] || ''}`;
+  const headFirstName = family.head_first_name || (family as any).first_name || '';
+  const headSurname = family.head_surname || (family as any).surname || '';
+  const headInitials = `${headFirstName[0] || ''}${headSurname[0] || ''}`;
   
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -74,10 +76,10 @@ export function JoinRequestDialog({ family, open, onClose, onSuccess }: Props) {
             </div>
             <div>
               <p className="font-semibold">
-                {family.head_first_name} {family.head_surname}'s Family
+                {headFirstName} {headSurname}'s Family
               </p>
               <p className="text-xs text-gray-600">
-                {family.number_of_family_members} members
+                {family.number_of_family_members || 1} members
               </p>
             </div>
           </div>
@@ -85,7 +87,7 @@ export function JoinRequestDialog({ family, open, onClose, onSuccess }: Props) {
         
         <div className="p-4 flex-1 overflow-y-auto bg-white">
           <p className="text-sm text-gray-700 mb-3">
-            How are you related to <span className="font-semibold">{family.head_first_name}</span>?
+            How are you related to <span className="font-semibold">{headFirstName}</span>?
           </p>
           
           <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-2">
@@ -115,7 +117,7 @@ export function JoinRequestDialog({ family, open, onClose, onSuccess }: Props) {
           {relationship && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
               <p className="text-xs text-blue-700">
-                <span className="font-semibold">You are saying:</span> "{family.head_first_name} is my {relationship}"
+                <span className="font-semibold">You are saying:</span> "{headFirstName} is my {relationship}"
               </p>
             </div>
           )}

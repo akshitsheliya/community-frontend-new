@@ -4,18 +4,26 @@ import type { FamilyMatch } from '@/lib/family-join-api';
 import { getParentPrefix } from '@/lib/text-helpers';
 
 interface Props {
-  family: FamilyMatch;
+  family: FamilyMatch | any;
   onSelect: () => void;
 }
 
-function getScoreColor(score: number): string {
+function getScoreColor(score?: number): string {
+  if (score === undefined || score === null) return 'bg-gray-50 text-gray-700 border-gray-200';
   if (score >= 90) return 'bg-green-50 text-green-700 border-green-200';
   if (score >= 60) return 'bg-blue-50 text-blue-700 border-blue-200';
   return 'bg-yellow-50 text-yellow-700 border-yellow-200';
 }
 
 export function FamilyMatchCard({ family, onSelect }: Props) {
-  const initials = `${family.head_first_name?.[0] || ''}${family.head_surname?.[0] || ''}`;
+  const firstName = family.head_first_name || family.first_name || '';
+  const surname = family.head_surname || family.surname || '';
+  const fatherName = family.head_father_name || family.father_name;
+  const gender = family.head_gender || family.gender;
+  const photo = family.head_photo || family.profile_photo;
+  const memberCount = family.number_of_family_members ?? 1;
+
+  const initials = `${firstName[0] || ''}${surname[0] || ''}`;
   const scoreColor = getScoreColor(family.match_score);
   
   return (
@@ -23,13 +31,22 @@ export function FamilyMatchCard({ family, onSelect }: Props) {
       {/* Header */}
       <div className={`px-4 py-2 border-b border-gray-50 flex items-center justify-between ${scoreColor}`}>
         <div className="flex items-center gap-2">
-          <Sparkles size={14} />
-          <span className="text-xs font-medium">
-            {family.match_score}% Match
-          </span>
+          {family.match_score !== undefined && family.match_score !== null ? (
+            <>
+              <Sparkles size={14} />
+              <span className="text-xs font-medium">
+                {family.match_score}% Match
+              </span>
+            </>
+          ) : (
+            <>
+              <Home size={14} />
+              <span className="text-xs font-medium">Community Family</span>
+            </>
+          )}
         </div>
         <div className="text-xs">
-          {family.number_of_family_members} member{family.number_of_family_members !== 1 ? 's' : ''}
+          {memberCount} member{memberCount !== 1 ? 's' : ''}
         </div>
       </div>
       
@@ -37,11 +54,11 @@ export function FamilyMatchCard({ family, onSelect }: Props) {
       <div className="p-4">
         <div className="flex items-start gap-3">
           {/* Avatar */}
-          <div className="w-14 h-14 rounded-full bg-[#A3232815] text-[#A32328] flex items-center justify-center font-bold text-lg flex-shrink-0">
-            {family.head_photo ? (
+          <div className="w-14 h-14 rounded-full bg-[#A3232815] text-[#A32328] flex items-center justify-center font-bold text-lg flex-shrink-0 overflow-hidden">
+            {photo ? (
               <img 
-                src={family.head_photo} 
-                alt={family.head_first_name}
+                src={photo} 
+                alt={firstName}
                 className="w-full h-full rounded-full object-cover"
               />
             ) : (
@@ -56,16 +73,18 @@ export function FamilyMatchCard({ family, onSelect }: Props) {
               <p className="text-xs text-gray-500">Family Head</p>
             </div>
             <h3 className="font-semibold text-gray-900">
-              {family.head_first_name} {family.head_surname}
+              {firstName} {surname}
             </h3>
-            {family.head_father_name && (
+            {fatherName && (
               <p className="text-xs text-gray-500">
-                {getParentPrefix(family.head_gender)} {family.head_father_name}
+                {getParentPrefix(gender)} {fatherName}
               </p>
             )}
-            <p className="text-xs text-gray-400 mt-1">
-              {family.head_gender}
-            </p>
+            {gender && (
+              <p className="text-xs text-gray-400 mt-1">
+                {gender}
+              </p>
+            )}
           </div>
         </div>
         

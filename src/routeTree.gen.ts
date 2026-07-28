@@ -35,6 +35,7 @@ import { Route as appDashboardIndexRouteImport } from './routes/(app)/dashboard/
 import { Route as appCommitteeIndexRouteImport } from './routes/(app)/committee/index'
 import { Route as appBusinessIndexRouteImport } from './routes/(app)/business/index'
 import { Route as appAbroadMembersIndexRouteImport } from './routes/(app)/abroad-members/index'
+import { Route as appAdminUserApprovalsIndexRouteImport } from './routes/(app)/admin/user-approvals/index'
 import { Route as appAdminSuggestionsIndexRouteImport } from './routes/(app)/admin/suggestions/index'
 
 const appRouteRoute = appRouteRouteImport.update({
@@ -166,6 +167,12 @@ const appAbroadMembersIndexRoute = appAbroadMembersIndexRouteImport.update({
   path: '/abroad-members/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appAdminUserApprovalsIndexRoute =
+  appAdminUserApprovalsIndexRouteImport.update({
+    id: '/admin/user-approvals/',
+    path: '/admin/user-approvals/',
+    getParentRoute: () => appRouteRoute,
+  } as any)
 const appAdminSuggestionsIndexRoute =
   appAdminSuggestionsIndexRouteImport.update({
     id: '/admin/suggestions/',
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof appProfileIndexRoute
   '/settings/': typeof appSettingsIndexRoute
   '/admin/suggestions/': typeof appAdminSuggestionsIndexRoute
+  '/admin/user-approvals/': typeof appAdminUserApprovalsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -228,6 +236,7 @@ export interface FileRoutesByTo {
   '/profile': typeof appProfileIndexRoute
   '/settings': typeof appSettingsIndexRoute
   '/admin/suggestions': typeof appAdminSuggestionsIndexRoute
+  '/admin/user-approvals': typeof appAdminUserApprovalsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -258,6 +267,7 @@ export interface FileRoutesById {
   '/(app)/profile/': typeof appProfileIndexRoute
   '/(app)/settings/': typeof appSettingsIndexRoute
   '/(app)/admin/suggestions/': typeof appAdminSuggestionsIndexRoute
+  '/(app)/admin/user-approvals/': typeof appAdminUserApprovalsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -288,6 +298,7 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/settings/'
     | '/admin/suggestions/'
+    | '/admin/user-approvals/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -316,6 +327,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/admin/suggestions'
+    | '/admin/user-approvals'
   id:
     | '__root__'
     | '/'
@@ -345,6 +357,7 @@ export interface FileRouteTypes {
     | '/(app)/profile/'
     | '/(app)/settings/'
     | '/(app)/admin/suggestions/'
+    | '/(app)/admin/user-approvals/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -542,6 +555,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appAbroadMembersIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/admin/user-approvals/': {
+      id: '/(app)/admin/user-approvals/'
+      path: '/admin/user-approvals'
+      fullPath: '/admin/user-approvals/'
+      preLoaderRoute: typeof appAdminUserApprovalsIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
     '/(app)/admin/suggestions/': {
       id: '/(app)/admin/suggestions/'
       path: '/admin/suggestions'
@@ -572,6 +592,7 @@ interface appRouteRouteChildren {
   appProfileIndexRoute: typeof appProfileIndexRoute
   appSettingsIndexRoute: typeof appSettingsIndexRoute
   appAdminSuggestionsIndexRoute: typeof appAdminSuggestionsIndexRoute
+  appAdminUserApprovalsIndexRoute: typeof appAdminUserApprovalsIndexRoute
 }
 
 const appRouteRouteChildren: appRouteRouteChildren = {
@@ -594,6 +615,7 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appProfileIndexRoute: appProfileIndexRoute,
   appSettingsIndexRoute: appSettingsIndexRoute,
   appAdminSuggestionsIndexRoute: appAdminSuggestionsIndexRoute,
+  appAdminUserApprovalsIndexRoute: appAdminUserApprovalsIndexRoute,
 }
 
 const appRouteRouteWithChildren = appRouteRoute._addFileChildren(

@@ -63,7 +63,7 @@ function MyRequestsPage() {
             You haven't sent any family join requests yet.
           </p>
           <Button 
-            onClick={() => navigate({ to: '/find-family' })}
+            onClick={() => navigate({ to: '/find-family', search: { from: undefined } })}
             className="bg-[#A32328] hover:bg-[#8B1E22]"
           >
             Find My Family

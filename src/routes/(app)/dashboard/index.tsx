@@ -12,11 +12,13 @@ import {
   Plane,
   Sparkles,
   Search,
-  Inbox
+  Inbox,
+  UserCheck
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { joinRequestApi } from '@/lib/family-join-api'
 import { matcherApi } from '@/lib/family-matcher-api'
+import { userVerificationApi } from '@/lib/user-verification-api'
 
 export const Route = createFileRoute('/(app)/dashboard/')({
   component: DashboardComponent,
@@ -48,6 +50,7 @@ function DashboardComponent() {
   
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
   const isAdmin = userData.is_community_admin === 1;
+  const isCommittee = userData.is_committee_member === 1 || isAdmin;
 
   const { data: incomingRequests = [] } = useQuery({
     queryKey: ['incoming-requests-count'],
@@ -63,6 +66,14 @@ function DashboardComponent() {
     refetchInterval: 60000
   });
   const pendingSuggestions = matcherStats?.pending || 0;
+
+  const { data: unverifiedUsers = [] } = useQuery({
+    queryKey: ['unverified-users-dashboard'],
+    queryFn: userVerificationApi.getUnverified,
+    enabled: isCommittee,
+    refetchInterval: 30000
+  });
+  const pendingUserApprovals = unverifiedUsers.length;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-8">
@@ -83,6 +94,14 @@ function DashboardComponent() {
       
       {/* Services Grid - Icon Cards (like mobile app) */}
       <div className="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+        {isCommittee && (
+          <DashboardItem 
+            icon={UserCheck} 
+            label="User Approvals" 
+            onClick={() => navigate({ to: '/admin/user-approvals' as any })} 
+            badge={pendingUserApprovals > 0 ? pendingUserApprovals.toString() : undefined}
+          />
+        )}
         {isAdmin && (
           <DashboardItem 
             icon={Sparkles} 
@@ -97,7 +116,7 @@ function DashboardComponent() {
         <DashboardItem 
           icon={Search} 
           label="Find Family" 
-          onClick={() => navigate({ to: '/find-family' })}
+          onClick={() => navigate({ to: '/find-family', search: { from: undefined } })}
         />
         <DashboardItem 
           icon={Inbox} 

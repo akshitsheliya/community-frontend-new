@@ -8,12 +8,15 @@ import {
   User,
   Pencil,
   Sparkles,
-  Trash2
+  Trash2,
+  UserCheck
 } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
-import { getUserData, logout } from "@/lib/auth"
+import { getUserData, logout, isAuthenticated, setUserData } from "@/lib/auth"
 import { toast } from "sonner"
 import { DeleteAccountDialog } from "@/components/profile/DeleteAccountDialog"
+import { LogoutConfirmDialog } from "@/components/common/LogoutConfirmDialog"
+import { userApi } from "@/lib/user-api"
 
 interface AppSidebarProps {
   isOpen: boolean
@@ -34,24 +37,25 @@ function SidebarItem({ icon, text, onClick }: { icon: React.ReactNode, text: str
 
 export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const navigate = useNavigate()
-  const [userState, setUserState] = React.useState(getUserData())
+  const [userState, setUserState] = React.useState<any>(getUserData())
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = React.useState(false)
 
   React.useEffect(() => {
-    if (!userState && isOpen) {
-      // Try fetching if opened and no user data
-      import('@/lib/api').then(({ authApi }) => {
-        authApi.getCurrentUser().then(res => {
-          if (res.data.success && res.data.data) {
-            import('@/lib/auth').then(({ setUserData }) => {
-              setUserData(res.data.data)
-              setUserState(res.data.data)
-            })
+    if (isOpen) {
+      setUserState(getUserData())
+      if (isAuthenticated()) {
+        userApi.getMe().then(res => {
+          if (res) {
+            setUserState(res)
+            setUserData(res)
           }
-        }).catch(err => console.error(err))
-      })
+        }).catch(err => {
+          console.error("Failed to fetch user profile:", err)
+        })
+      }
     }
-  }, [userState, isOpen])
+  }, [isOpen])
 
   const firstName = userState?.first_name || "Guest"
   const surname = userState?.surname || ""
@@ -59,12 +63,8 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const phoneNumber = userState?.phone_number || ""
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to log out?")) {
-      onClose()
-      logout()
-      toast.success("Logged out successfully")
-      navigate({ to: "/login" })
-    }
+    onClose()
+    setIsLogoutDialogOpen(true)
   }
 
   const navigateTo = (path: string) => {
@@ -136,23 +136,31 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           
           <SidebarItem icon={<LogOut size={22} />} text="Log Out" onClick={handleLogout} />
           
-          {userState?.is_community_admin === 1 && (
+          {(userState?.is_community_admin === 1 || userState?.is_committee_member === 1) && (
             <>
               <div className="my-2 border-t border-gray-100 mx-2" />
               <div className="text-xs font-medium text-gray-400 uppercase tracking-wide px-3 py-1">
-                Admin
+                Committee Portal
               </div>
               <SidebarItem 
-                icon={<Sparkles size={22} />} 
-                text="AI Suggestions" 
-                onClick={() => navigateTo('/admin/suggestions')}
+                icon={<UserCheck size={22} />} 
+                text="User Approvals" 
+                onClick={() => navigateTo('/admin/user-approvals')}
               />
+              {userState?.is_community_admin === 1 && (
+                <SidebarItem 
+                  icon={<Sparkles size={22} />} 
+                  text="AI Suggestions" 
+                  onClick={() => navigateTo('/admin/suggestions')}
+                />
+              )}
             </>
           )}
         </div>
       </div>
 
       <DeleteAccountDialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} />
+      <LogoutConfirmDialog open={isLogoutDialogOpen} onClose={() => setIsLogoutDialogOpen(false)} />
     </>
   )
 }

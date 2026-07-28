@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LOCAL_STORAGE_KEYS } from "./constants";
+import { logout } from "./auth";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:4002",
@@ -21,9 +21,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      // Handle unauthorized (e.g., clear token, redirect)
-      console.error("Authentication error");
+    if (error.response?.status === 401) {
+      logout();
     }
     return Promise.reject(error);
   }
@@ -53,6 +52,21 @@ export const authApi = {
   },
   verifyRegisterOtp: async (data: OtpVerifyRequest) => {
     return api.post<ApiResponse<AuthResponse>>("/api/register/verify-otp", data);
+  },
+  createProfile: async (data: {
+    phone_number: string;
+    first_name: string;
+    father_name?: string;
+    surname: string;
+    gender?: string;
+    number_of_family_members?: number;
+  }) => {
+    return api.post<ApiResponse<any>>("/api/profile", {
+      father_name: "",
+      gender: "Male",
+      number_of_family_members: 1,
+      ...data
+    });
   },
   getCurrentUser: async () => {
     return api.get<ApiResponse<User>>("/api/user");

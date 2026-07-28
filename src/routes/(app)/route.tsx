@@ -6,7 +6,7 @@ export const Route = createFileRoute('/(app)')({
   beforeLoad: async () => {
     if (!isAuthenticated()) {
       throw redirect({
-        to: '/login',
+        to: '/community',
       })
     }
   },

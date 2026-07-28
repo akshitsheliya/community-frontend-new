@@ -12,12 +12,14 @@ import { Loader2, ArrowLeft } from 'lucide-react'
 // Define search params type
 type LoginOtpSearch = {
   phone?: string
+  mode?: string
 }
 
 export const Route = createFileRoute('/(auth)/login-otp')({
   validateSearch: (search: Record<string, unknown>): LoginOtpSearch => {
     return {
       phone: search.phone as string | undefined,
+      mode: search.mode as string | undefined,
     }
   },
   component: LoginOtpComponent,
@@ -31,7 +33,7 @@ function isRecentlyRegistered(addedOn: string): boolean {
 }
 
 function LoginOtpComponent() {
-  const { phone } = Route.useSearch()
+  const { phone, mode } = Route.useSearch()
   const navigate = useNavigate()
   
   const [otp, setOtp] = React.useState('')
@@ -61,40 +63,76 @@ function LoginOtpComponent() {
 
     setIsLoading(true)
     try {
-      const response = await authApi.verifyLoginOtp({
-        phone_number: phone,
-        otp,
-      })
+      let communityUuid = undefined
+      const storedComm = localStorage.getItem('communityData')
+      if (storedComm) {
+        try {
+          const parsed = JSON.parse(storedComm)
+          communityUuid = parsed.community_uuid
+        } catch (e) {}
+      }
+
+      // If mode is register OR pending registration exists in sessionStorage
+      const pendingRegStr = sessionStorage.getItem(`pending_reg_${phone}`)
+      const isRegisterMode = mode === 'register' || !!pendingRegStr
+
+      const verifyFn = isRegisterMode 
+        ? authApi.verifyRegisterOtp({ phone_number: phone, otp, community_uuid: communityUuid })
+        : authApi.verifyLoginOtp({ phone_number: phone, otp })
+
+      const response = await verifyFn
       
       if (response.data.success) {
-        toast.success(response.data.message || 'Login successful')
-        
-        // Store token and user data
-        if (response.data.data.token) {
-          setToken(response.data.data.token)
-          // Fetch user profile immediately
-          try {
-            const userResponse = await authApi.getCurrentUser()
-            if (userResponse.data.success && userResponse.data.data) {
-              const userData = userResponse.data.data;
-              setUserData(userData);
-              
-              const isNewUser = !userData.family_sr_id || userData.family_sr_id === null;
-              const registeredRecently = isRecentlyRegistered(userData.added_on);
-              
-              if (isNewUser && registeredRecently) {
-                toast.success("Login successful! Let's find your family.");
-                navigate({ to: '/find-family', search: { from: 'registration' } });
-                return;
-              }
-            }
-          } catch (e) {
-            console.error("Failed to fetch user data", e)
-          }
-        } else if (response.data.data.user) {
-          setUserData(response.data.data.user)
+        const authData = response.data.data
+        if (authData?.token) {
+          setToken(authData.token)
         }
-        
+
+        // Check if profile creation is needed
+        if (pendingRegStr) {
+          try {
+            const { first_name, surname } = JSON.parse(pendingRegStr)
+            await authApi.createProfile({
+              phone_number: phone,
+              first_name: first_name || 'Member',
+              surname: surname || 'Patel',
+              father_name: '-',
+              gender: 'Male',
+              number_of_family_members: 1,
+            })
+            sessionStorage.removeItem(`pending_reg_${phone}`)
+          } catch (e) {
+            console.error('Profile creation error:', e)
+          }
+        }
+
+        // Fetch latest user info
+        try {
+          const userResponse = await authApi.getCurrentUser()
+          if (userResponse.data.success && userResponse.data.data) {
+            const userData = userResponse.data.data
+            setUserData(userData)
+
+            if (isRegisterMode) {
+              toast.success("Account created successfully! Let's find your family.")
+              navigate({ to: '/find-family', search: { from: 'registration' } })
+              return
+            }
+
+            const isNewUser = !userData.family_sr_id || userData.family_sr_id === null
+            const registeredRecently = isRecentlyRegistered(userData.added_on)
+            
+            if (isNewUser && registeredRecently) {
+              toast.success("Login successful! Let's find your family.")
+              navigate({ to: '/find-family', search: { from: 'registration' } })
+              return
+            }
+          }
+        } catch (e) {
+          console.error("Failed to fetch user data", e)
+        }
+
+        toast.success(response.data.message || 'Login successful')
         navigate({ to: '/dashboard' })
       } else {
         toast.error(response.data.message || 'Invalid OTP')
