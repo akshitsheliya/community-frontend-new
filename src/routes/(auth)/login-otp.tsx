@@ -184,17 +184,19 @@ function LoginOtpComponent() {
           <p className="text-xs text-gray-400 mt-1">Hint: Use 221221 for testing</p>
         </div>
 
-        <div className="space-y-8">
+        <form onSubmit={(e) => { e.preventDefault(); handleVerify(); }} className="space-y-8">
           <div className="flex justify-center">
             <OtpInput
               value={otp}
               onChange={setOtp}
               length={6}
               disabled={isLoading}
+              onEnter={handleVerify}
             />
           </div>
 
           <Button 
+            type="submit"
             onClick={handleVerify}
             className="w-full h-12 bg-theme hover:bg-theme-hover text-white text-base" 
             disabled={isLoading || otp.length !== 6}
@@ -219,7 +221,7 @@ function LoginOtpComponent() {
               )}
             </p>
           </div>
-        </div>
+        </form>
       </div>
     </AuthLayout>
   )

@@ -7,6 +7,7 @@ interface OtpInputProps {
   length?: number
   disabled?: boolean
   error?: boolean
+  onEnter?: () => void
 }
 
 export function OtpInput({ 
@@ -14,7 +15,8 @@ export function OtpInput({
   onChange, 
   length = 6, 
   disabled = false,
-  error = false
+  error = false,
+  onEnter
 }: OtpInputProps) {
   const [otp, setOtp] = React.useState<string[]>(Array(length).fill(""))
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([])
@@ -83,6 +85,11 @@ export function OtpInput({
     } else if (e.key === "ArrowRight" && index < length - 1) {
       e.preventDefault()
       inputRefs.current[index + 1]?.focus()
+    } else if (e.key === "Enter") {
+      if (onEnter) {
+        e.preventDefault()
+        onEnter()
+      }
     }
   }
 
@@ -91,7 +98,7 @@ export function OtpInput({
       {Array.from({ length }).map((_, index) => (
         <input
           key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
+          ref={(el) => { inputRefs.current[index] = el }}
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"

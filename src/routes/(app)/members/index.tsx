@@ -69,10 +69,10 @@ function MembersListPage() {
   }, [members, activeFilter, searchQuery, user?.family_uuid]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-white px-4 pt-6 pb-4 sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+    <div className="max-w-4xl mx-auto space-y-4 pb-12">
+      {/* Header & Filters Card */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Members</h1>
           
           {/* Add Member Button (Admin only) */}
@@ -85,12 +85,10 @@ function MembersListPage() {
         </div>
 
         {/* Search */}
-        <div className="mb-4">
-          <MemberSearchBar 
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
-        </div>
+        <MemberSearchBar 
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
 
         {/* Filters */}
         <MemberFilterChips 
@@ -99,38 +97,36 @@ function MembersListPage() {
         />
       </div>
 
-      <div className="p-4">
-        {/* Count/Status */}
-        {!isLoading && !isError && (
-          <p className="text-sm text-gray-500 mb-4 font-medium">
-            Showing {filteredMembers.length} {filteredMembers.length === 1 ? 'member' : 'members'}
-          </p>
-        )}
+      {/* Count/Status */}
+      {!isLoading && !isError && (
+        <p className="text-sm text-gray-500 font-medium px-1">
+          Showing {filteredMembers.length} {filteredMembers.length === 1 ? 'member' : 'members'}
+        </p>
+      )}
 
-        {/* List Content */}
-        {isLoading ? (
-          <MembersListSkeleton />
-        ) : isError ? (
-          <div className="py-8">
-            <ErrorState onRetry={() => refetch()} />
-          </div>
-        ) : filteredMembers.length === 0 ? (
-          <EmptyMembersState 
-            searchQuery={searchQuery} 
-            onClearSearch={() => setSearchQuery('')}
-          />
-        ) : (
-          <div className="space-y-3">
-            {filteredMembers.map(member => (
-              <MemberCard 
-                key={member.member_uuid} 
-                member={member} 
-                onClick={() => setSelectedMember(member)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* List Content */}
+      {isLoading ? (
+        <MembersListSkeleton />
+      ) : isError ? (
+        <div className="py-8">
+          <ErrorState onRetry={() => refetch()} />
+        </div>
+      ) : filteredMembers.length === 0 ? (
+        <EmptyMembersState 
+          searchQuery={searchQuery} 
+          onClearSearch={() => setSearchQuery('')}
+        />
+      ) : (
+        <div className="space-y-3">
+          {filteredMembers.map(member => (
+            <MemberCard 
+              key={member.member_uuid} 
+              member={member} 
+              onClick={() => setSelectedMember(member)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Detail Drawer */}
       <MemberDetailDrawer 

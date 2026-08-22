@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query'
 import { joinRequestApi } from '@/lib/family-join-api'
 import { matcherApi } from '@/lib/family-matcher-api'
 import { userVerificationApi } from '@/lib/user-verification-api'
+import { familyGraphApi } from '@/lib/family-graph-api'
 
 export const Route = createFileRoute('/(app)/dashboard/')({
   component: DashboardComponent,
@@ -57,7 +58,14 @@ function DashboardComponent() {
     queryFn: joinRequestApi.getIncoming,
     refetchInterval: 60000
   });
-  const pendingIncoming = incomingRequests.filter(r => r.status === 'pending').length;
+
+  const { data: relationshipRequests = [] } = useQuery({
+    queryKey: ['pending-relationships-count'],
+    queryFn: familyGraphApi.getPending,
+    refetchInterval: 60000
+  });
+
+  const pendingIncoming = incomingRequests.filter(r => r.status === 'pending').length + relationshipRequests.length;
 
   const { data: matcherStats } = useQuery({
     queryKey: ['matcher-stats-dashboard'],

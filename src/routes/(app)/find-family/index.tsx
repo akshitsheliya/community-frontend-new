@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { joinRequestApi } from '@/lib/family-join-api';
 import { api } from '@/lib/api';
+import { logout } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -17,6 +18,13 @@ import {
 import { toast } from 'sonner';
 import { FamilyMatchCard } from '@/components/family-join/FamilyMatchCard';
 import { JoinRequestDialog } from '@/components/family-join/JoinRequestDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
 
 export const Route = createFileRoute('/(app)/find-family/')({
   validateSearch: (search) => ({
@@ -33,6 +41,7 @@ function FindFamilyPage() {
   const [selectedFamily, setSelectedFamily] = useState<any>(null);
   const [manualSearch, setManualSearch] = useState('');
   const [showAllFamilies, setShowAllFamilies] = useState(false);
+  const [showApprovalNotice, setShowApprovalNotice] = useState(false);
   const queryClient = useQueryClient();
   
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -85,13 +94,24 @@ function FindFamilyPage() {
       number_of_family_members: family.number_of_family_members || 1,
     });
   };
+
+  const handleFinishRegistration = () => {
+    toast.info('Registration complete! Please log in after committee approval.');
+    logout();
+  };
   
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-4 pb-8">
       {/* Header */}
       <div className="flex items-center gap-2">
         <button
-          onClick={() => navigate({ to: '/dashboard' })}
+          onClick={() => {
+            if (isFirstTime) {
+              setShowApprovalNotice(true);
+            } else {
+              navigate({ to: '/dashboard' });
+            }
+          }}
           className="p-2 hover:bg-gray-100 rounded-lg"
         >
           <ArrowLeft size={20} />
@@ -297,8 +317,12 @@ function FindFamilyPage() {
           
           <Button 
             onClick={() => {
-              toast.success('Welcome! You can add family members from the Family Tree.');
-              navigate({ to: '/dashboard' });
+              if (isFirstTime) {
+                setShowApprovalNotice(true);
+              } else {
+                toast.success('Welcome! You can add family members from the Family Tree.');
+                navigate({ to: '/dashboard' });
+              }
             }}
             variant="outline"
             className="w-full border-green-200 text-green-700 hover:bg-green-50"
@@ -319,10 +343,45 @@ function FindFamilyPage() {
             setSelectedFamily(null);
             queryClient.invalidateQueries({ queryKey: ['family-matches'] });
             queryClient.invalidateQueries({ queryKey: ['all-families'] });
-            toast.success('Join request sent! You will be notified when reviewed.');
-            navigate({ to: '/my-requests' });
+            if (isFirstTime) {
+              setShowApprovalNotice(true);
+            } else {
+              toast.success('Join request sent! You will be notified when reviewed.');
+              navigate({ to: '/my-requests' });
+            }
           }}
         />
+      )}
+
+      {/* Registration & Committee Approval Pending Modal */}
+      {showApprovalNotice && (
+        <Dialog open={showApprovalNotice} onOpenChange={() => handleFinishRegistration()}>
+          <DialogContent className="max-w-md bg-white text-gray-900 p-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 border border-amber-200">
+              <Sparkles size={32} />
+            </div>
+            <DialogTitle className="text-xl font-bold text-gray-900 mb-2">
+              Registration Submitted! 🎉
+            </DialogTitle>
+            <div className="text-sm text-gray-600 space-y-3 leading-relaxed">
+              <p>
+                Your profile setup and family selection have been submitted successfully.
+              </p>
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 text-left space-y-1">
+                <span className="font-semibold block text-amber-950">⏳ Account Pending Committee Approval</span>
+                Your account is currently under review by a <strong>Committee Member</strong>. Once a committee member approves your registration, you can log in with your phone number to access the dashboard and profile.
+              </div>
+            </div>
+            <DialogFooter className="mt-6 sm:justify-center">
+              <Button
+                onClick={handleFinishRegistration}
+                className="w-full bg-[#A32328] hover:bg-[#8B1E22] text-white font-medium"
+              >
+                Back to Login
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

@@ -9,7 +9,8 @@ import {
   Pencil,
   Sparkles,
   Trash2,
-  UserCheck
+  UserCheck,
+  Home as HomeIcon
 } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { getUserData, logout, isAuthenticated, setUserData } from "@/lib/auth"
@@ -125,6 +126,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
         <div className="bg-white text-black rounded-t-2xl -mt-4 relative p-2 pt-4 space-y-1 overflow-y-auto" 
              style={{ height: 'calc(100vh - 100px)' }}>
           
+          <SidebarItem icon={<HomeIcon size={22} />} text="Home" onClick={() => navigateTo('/dashboard')} />
           <SidebarItem icon={<User size={22} />} text="My Profile" onClick={() => navigateTo('/profile')} />
           <SidebarItem icon={<Settings size={22} />} text="Settings" onClick={() => navigateTo('/settings')} />
           <SidebarItem icon={<Shield size={22} />} text="Privacy Policy" onClick={() => navigateTo('/privacy-policy')} />

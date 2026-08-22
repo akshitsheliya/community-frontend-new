@@ -88,10 +88,11 @@ export function AddRelationshipDialog({ open, onClose }: Props) {
       relationship,
       currentMemberId
     ),
-    onSuccess: () => {
-      toast.success(`Added ${selectedMember.first_name} as your ${relationship}!`);
+    onSuccess: (res: any) => {
+      toast.success(res?.message || `Relationship request sent to ${selectedMember.first_name}!`);
       queryClient.invalidateQueries({ queryKey: ['family-tree'] });
       queryClient.invalidateQueries({ queryKey: ['my-relationships'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-relationships'] });
       handleClose();
     },
     onError: (err: any) => {
