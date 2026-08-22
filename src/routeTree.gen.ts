@@ -25,6 +25,7 @@ import { Route as appMyRequestsIndexRouteImport } from './routes/(app)/my-reques
 import { Route as appMembersIndexRouteImport } from './routes/(app)/members/index'
 import { Route as appMarksheetsIndexRouteImport } from './routes/(app)/marksheets/index'
 import { Route as appHelpIndexRouteImport } from './routes/(app)/help/index'
+import { Route as appGlobalAdminIndexRouteImport } from './routes/(app)/global-admin/index'
 import { Route as appGalleryIndexRouteImport } from './routes/(app)/gallery/index'
 import { Route as appFindFamilyIndexRouteImport } from './routes/(app)/find-family/index'
 import { Route as appFamilyTreeIndexRouteImport } from './routes/(app)/family-tree/index'
@@ -117,6 +118,11 @@ const appHelpIndexRoute = appHelpIndexRouteImport.update({
   path: '/help/',
   getParentRoute: () => appRouteRoute,
 } as any)
+const appGlobalAdminIndexRoute = appGlobalAdminIndexRouteImport.update({
+  id: '/global-admin/',
+  path: '/global-admin/',
+  getParentRoute: () => appRouteRoute,
+} as any)
 const appGalleryIndexRoute = appGalleryIndexRouteImport.update({
   id: '/gallery/',
   path: '/gallery/',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/family-tree/': typeof appFamilyTreeIndexRoute
   '/find-family/': typeof appFindFamilyIndexRoute
   '/gallery/': typeof appGalleryIndexRoute
+  '/global-admin/': typeof appGlobalAdminIndexRoute
   '/help/': typeof appHelpIndexRoute
   '/marksheets/': typeof appMarksheetsIndexRoute
   '/members/': typeof appMembersIndexRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/family-tree': typeof appFamilyTreeIndexRoute
   '/find-family': typeof appFindFamilyIndexRoute
   '/gallery': typeof appGalleryIndexRoute
+  '/global-admin': typeof appGlobalAdminIndexRoute
   '/help': typeof appHelpIndexRoute
   '/marksheets': typeof appMarksheetsIndexRoute
   '/members': typeof appMembersIndexRoute
@@ -258,6 +266,7 @@ export interface FileRoutesById {
   '/(app)/family-tree/': typeof appFamilyTreeIndexRoute
   '/(app)/find-family/': typeof appFindFamilyIndexRoute
   '/(app)/gallery/': typeof appGalleryIndexRoute
+  '/(app)/global-admin/': typeof appGlobalAdminIndexRoute
   '/(app)/help/': typeof appHelpIndexRoute
   '/(app)/marksheets/': typeof appMarksheetsIndexRoute
   '/(app)/members/': typeof appMembersIndexRoute
@@ -289,6 +298,7 @@ export interface FileRouteTypes {
     | '/family-tree/'
     | '/find-family/'
     | '/gallery/'
+    | '/global-admin/'
     | '/help/'
     | '/marksheets/'
     | '/members/'
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/family-tree'
     | '/find-family'
     | '/gallery'
+    | '/global-admin'
     | '/help'
     | '/marksheets'
     | '/members'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/(app)/family-tree/'
     | '/(app)/find-family/'
     | '/(app)/gallery/'
+    | '/(app)/global-admin/'
     | '/(app)/help/'
     | '/(app)/marksheets/'
     | '/(app)/members/'
@@ -485,6 +497,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof appHelpIndexRouteImport
       parentRoute: typeof appRouteRoute
     }
+    '/(app)/global-admin/': {
+      id: '/(app)/global-admin/'
+      path: '/global-admin'
+      fullPath: '/global-admin/'
+      preLoaderRoute: typeof appGlobalAdminIndexRouteImport
+      parentRoute: typeof appRouteRoute
+    }
     '/(app)/gallery/': {
       id: '/(app)/gallery/'
       path: '/gallery'
@@ -583,6 +602,7 @@ interface appRouteRouteChildren {
   appFamilyTreeIndexRoute: typeof appFamilyTreeIndexRoute
   appFindFamilyIndexRoute: typeof appFindFamilyIndexRoute
   appGalleryIndexRoute: typeof appGalleryIndexRoute
+  appGlobalAdminIndexRoute: typeof appGlobalAdminIndexRoute
   appHelpIndexRoute: typeof appHelpIndexRoute
   appMarksheetsIndexRoute: typeof appMarksheetsIndexRoute
   appMembersIndexRoute: typeof appMembersIndexRoute
@@ -606,6 +626,7 @@ const appRouteRouteChildren: appRouteRouteChildren = {
   appFamilyTreeIndexRoute: appFamilyTreeIndexRoute,
   appFindFamilyIndexRoute: appFindFamilyIndexRoute,
   appGalleryIndexRoute: appGalleryIndexRoute,
+  appGlobalAdminIndexRoute: appGlobalAdminIndexRoute,
   appHelpIndexRoute: appHelpIndexRoute,
   appMarksheetsIndexRoute: appMarksheetsIndexRoute,
   appMembersIndexRoute: appMembersIndexRoute,

@@ -13,7 +13,8 @@ import {
   Sparkles,
   Search,
   Inbox,
-  UserCheck
+  UserCheck,
+  ShieldCheck
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { joinRequestApi } from '@/lib/family-join-api'
@@ -52,6 +53,7 @@ function DashboardComponent() {
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
   const isAdmin = userData.is_community_admin === 1;
   const isCommittee = userData.is_committee_member === 1 || isAdmin;
+  const isGlobalAdmin = localStorage.getItem('is_global_admin') === 'true' || userData.phone_number === '9999900001' || userData.is_global_admin;
 
   const { data: incomingRequests = [] } = useQuery({
     queryKey: ['incoming-requests-count'],
@@ -99,9 +101,41 @@ function DashboardComponent() {
           <p className="text-white/90 text-sm md:text-base max-w-lg mx-auto">Stay connected with members, get the latest updates, and participate in community events.</p>
         </div>
       </div>
+
+      {/* Global Admin Quick Banner */}
+      {isGlobalAdmin && (
+        <div className="bg-gradient-to-r from-amber-600 via-red-600 to-amber-700 text-white rounded-2xl p-4 md:p-5 shadow-md flex items-center justify-between gap-4 border border-amber-300/30">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white shrink-0 shadow-inner">
+              <ShieldCheck size={28} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-base md:text-lg tracking-tight">Global Admin Control Center</span>
+                <span className="bg-amber-300 text-amber-950 font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-full">Rajesh Patel</span>
+              </div>
+              <p className="text-xs text-white/90 mt-0.5">Manage all communities, approvals, user copy/move & forced session actions.</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => navigate({ to: '/global-admin' as any })}
+            className="bg-white text-red-700 hover:bg-amber-50 font-bold px-4 py-2.5 rounded-xl text-xs md:text-sm shadow-md transition flex items-center gap-1.5 shrink-0"
+          >
+            <span>Open Admin Panel</span>
+            <ShieldCheck size={16} />
+          </button>
+        </div>
+      )}
       
       {/* Services Grid - Icon Cards (like mobile app) */}
       <div className="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+        {isGlobalAdmin && (
+          <DashboardItem 
+            icon={ShieldCheck} 
+            label="Global Admin" 
+            onClick={() => navigate({ to: '/global-admin' as any })} 
+          />
+        )}
         {isCommittee && (
           <DashboardItem 
             icon={UserCheck} 

@@ -10,6 +10,7 @@ import {
   Sparkles,
   Trash2,
   UserCheck,
+  ShieldCheck,
   Home as HomeIcon
 } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
@@ -45,7 +46,8 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   React.useEffect(() => {
     if (isOpen) {
       setUserState(getUserData())
-      if (isAuthenticated()) {
+      const isGlobalAdmin = localStorage.getItem('is_global_admin') === 'true'
+      if (isAuthenticated() && !isGlobalAdmin) {
         userApi.getMe().then(res => {
           if (res) {
             setUserState(res)
@@ -127,6 +129,13 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
              style={{ height: 'calc(100vh - 100px)' }}>
           
           <SidebarItem icon={<HomeIcon size={22} />} text="Home" onClick={() => navigateTo('/dashboard')} />
+          {(localStorage.getItem('is_global_admin') === 'true' || userState?.phone_number === '9999900001' || userState?.is_global_admin) && (
+            <SidebarItem 
+              icon={<ShieldCheck size={22} className="text-amber-600 font-bold" />} 
+              text="Global Admin Panel" 
+              onClick={() => navigateTo('/global-admin')} 
+            />
+          )}
           <SidebarItem icon={<User size={22} />} text="My Profile" onClick={() => navigateTo('/profile')} />
           <SidebarItem icon={<Settings size={22} />} text="Settings" onClick={() => navigateTo('/settings')} />
           <SidebarItem icon={<Shield size={22} />} text="Privacy Policy" onClick={() => navigateTo('/privacy-policy')} />

@@ -22,7 +22,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      logout();
+      const isGlobalAdmin = typeof window !== 'undefined' && localStorage.getItem('is_global_admin') === 'true';
+      if (!isGlobalAdmin) {
+        logout();
+      }
     }
     return Promise.reject(error);
   }

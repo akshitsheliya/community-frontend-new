@@ -6,6 +6,7 @@ import { matcherApi } from '@/lib/family-matcher-api'
 import { notificationApi } from '@/lib/notifications-api'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { AdminChatWidget } from '@/components/common/AdminChatWidget'
 
 interface AppHeaderProps {
   onMenuClick: () => void
@@ -15,7 +16,8 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
   const navigate = useNavigate();
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
   const isAdmin = userData.is_community_admin === 1;
-  const isAuthenticated = !!localStorage.getItem('authToken');
+  const isGlobalAdmin = localStorage.getItem('is_global_admin') === 'true';
+  const isAuthenticated = !isGlobalAdmin && !!localStorage.getItem('authToken');
   
   // Fetch incoming join requests count
   const { data: incomingRequests = [] } = useQuery({
@@ -66,6 +68,8 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
       </h1>
       
       <div className="ml-auto flex items-center gap-2">
+        <AdminChatWidget />
+        
         <button 
           onClick={handleBellClick}
           className="p-2 hover:bg-gray-100 rounded-lg relative transition-colors" 

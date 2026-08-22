@@ -4,7 +4,8 @@ import { AppLayout } from '@/components/layout/AppLayout'
 
 export const Route = createFileRoute('/(app)')({
   beforeLoad: async () => {
-    if (!isAuthenticated()) {
+    const isGlobalAdmin = typeof window !== 'undefined' && localStorage.getItem('is_global_admin') === 'true'
+    if (!isAuthenticated() && !isGlobalAdmin) {
       throw redirect({
         to: '/community',
       })
