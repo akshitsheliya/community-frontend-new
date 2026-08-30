@@ -33,9 +33,12 @@ function FamilyTreePage() {
   const memberId = Number(userData.member_id);  // Ensure it's a number
   const userName = `${userData.first_name || 'You'} ${userData.surname || ''}`.trim();
   
+  const communityData = JSON.parse(localStorage.getItem('communityData') || '{}');
+  const activeCommunity = communityData.community_id || communityData.community_uuid || 'comm';
+
   // Fetch family tree
   const { data: tree, isLoading, isError, refetch, isRefetching } = useQuery({
-    queryKey: ['family-tree', memberUuid],
+    queryKey: ['family-tree', memberUuid, activeCommunity],
     queryFn: () => familyGraphApi.getFamilyTree(memberUuid, 3),
     enabled: !!memberUuid
   });
@@ -63,6 +66,12 @@ function FamilyTreePage() {
       0
     );
   }, [groups]);
+
+  // Existing member IDs in current family tree to prevent duplicate additions
+  const existingMemberIds = useMemo(() => {
+    if (!tree?.nodes) return [];
+    return tree.nodes.map((n: any) => Number(n.id));
+  }, [tree]);
   
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-4 pb-8">
@@ -248,6 +257,7 @@ function FamilyTreePage() {
       <AddRelationshipDialog 
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
+        existingMemberIds={existingMemberIds}
       />
     </div>
   );

@@ -30,8 +30,10 @@ import {
   RefreshCw,
   LogOut,
   AlertTriangle,
+  ArrowLeft,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { isDirectAdminSession } from '@/lib/auth';
 
 export const Route = createFileRoute('/(app)/global-admin/')({
   component: GlobalAdminPage,
@@ -39,6 +41,7 @@ export const Route = createFileRoute('/(app)/global-admin/')({
 
 function GlobalAdminPage() {
   const navigate = useNavigate();
+  const isDirectAdmin = isDirectAdminSession();
   const [activeTab, setActiveTab] = useState<'pending' | 'directory'>('pending');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCommunityFilter, setSelectedCommunityFilter] = useState<string>('all');
@@ -169,18 +172,35 @@ function GlobalAdminPage() {
               <RefreshCw size={16} className={`mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button
-              onClick={() => {
-                localStorage.removeItem('is_global_admin');
-                navigate({ to: '/community' });
-              }}
-              variant="outline"
-              size="sm"
-              className="bg-white text-theme hover:bg-gray-100 font-semibold"
-            >
-              <LogOut size={16} className="mr-1.5" />
-              Exit Admin
-            </Button>
+            {isDirectAdmin ? (
+              <Button
+                onClick={() => {
+                  localStorage.removeItem('is_global_admin');
+                  localStorage.removeItem('is_direct_admin');
+                  localStorage.removeItem('authToken');
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('userData');
+                  localStorage.removeItem('communityData');
+                  navigate({ to: '/community' });
+                }}
+                variant="outline"
+                size="sm"
+                className="bg-white text-theme hover:bg-gray-100 font-semibold shadow-sm"
+              >
+                <LogOut size={16} className="mr-1.5" />
+                Exit Admin
+              </Button>
+            ) : (
+              <Button
+                onClick={() => navigate({ to: '/dashboard' })}
+                variant="outline"
+                size="sm"
+                className="bg-white text-theme hover:bg-gray-100 font-semibold shadow-sm"
+              >
+                <ArrowLeft size={16} className="mr-1.5" />
+                Back to Dashboard
+              </Button>
+            )}
           </div>
         </div>
 

@@ -53,17 +53,21 @@ const RELATIONSHIPS = [
 interface Props {
   open: boolean;
   onClose: () => void;
+  existingMemberIds?: number[];
 }
 
-export function AddRelationshipDialog({ open, onClose }: Props) {
+export function AddRelationshipDialog({ open, onClose, existingMemberIds = [] }: Props) {
   const [step, setStep] = useState<'search' | 'relation'>('search');
   const [search, setSearch] = useState('');
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [relationship, setRelationship] = useState('');
   const queryClient = useQueryClient();
   
+  const communityData = JSON.parse(localStorage.getItem('communityData') || '{}');
+  const activeCommunity = communityData.community_id || communityData.community_uuid || 'comm';
+
   const { data: members = [] } = useQuery({
-    queryKey: ['members'],
+    queryKey: ['members', activeCommunity],
     queryFn: async () => {
       const res = await api.get('/api/members');
       return res.data.data || [];
@@ -72,10 +76,17 @@ export function AddRelationshipDialog({ open, onClose }: Props) {
   
   // Get current user id to filter out from list
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-  const currentMemberId = userData.member_id;
+  const currentMemberId = Number(userData.member_id);
+  const currentMemberUuid = userData.member_uuid;
   
   const filtered = members
-    .filter((m: any) => m.member_id !== currentMemberId)  // exclude self
+    .filter((m: any) => {
+      // Exclude self
+      if (Number(m.member_id) === currentMemberId) return false;
+      if (currentMemberUuid && m.member_uuid === currentMemberUuid) return false;
+      if (userData.phone_number && m.phone_number === userData.phone_number) return false;
+      return true;
+    })
     .filter((m: any) => {
       if (!search) return true;
       const name = `${m.first_name} ${m.surname}`.toLowerCase();
@@ -109,6 +120,9 @@ export function AddRelationshipDialog({ open, onClose }: Props) {
   };
   
   const handleSelectMember = (member: any) => {
+    if (existingMemberIds.includes(Number(member.member_id))) {
+      return; // Prevent selection of already added member
+    }
     setSelectedMember(member);
     setStep('relation');
   };
@@ -144,7 +158,7 @@ export function AddRelationshipDialog({ open, onClose }: Props) {
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-2">
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
               {filtered.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <User className="mx-auto h-12 w-12 text-gray-300 mb-2" />
@@ -153,19 +167,33 @@ export function AddRelationshipDialog({ open, onClose }: Props) {
               ) : (
                 filtered.slice(0, 20).map((m: any) => {
                   const initials = `${m.first_name?.[0] || ''}${m.surname?.[0] || ''}`;
+                  const isAlreadyAdded = existingMemberIds.includes(Number(m.member_id));
                   return (
                     <div 
                       key={m.member_id}
                       onClick={() => handleSelectMember(m)}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded-lg transition"
+                      className={`flex items-center gap-3 p-3 rounded-lg transition ${
+                        isAlreadyAdded 
+                          ? 'bg-gray-50/70 opacity-60 cursor-not-allowed border border-dashed border-gray-200' 
+                          : 'hover:bg-gray-50 cursor-pointer border border-transparent'
+                      }`}
                     >
-                      <div className="w-10 h-10 rounded-full bg-[#A3232815] text-[#A32328] flex items-center justify-center font-semibold">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                        isAlreadyAdded ? 'bg-gray-200 text-gray-500' : 'bg-[#A3232815] text-[#A32328]'
+                      }`}>
                         {initials}
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">
-                          {m.first_name} {m.surname}
-                        </p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className={`font-medium truncate ${isAlreadyAdded ? 'text-gray-500' : 'text-gray-900'}`}>
+                            {m.first_name} {m.surname}
+                          </p>
+                          {isAlreadyAdded && (
+                            <span className="text-[10px] bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded-full border border-amber-200 inline-flex items-center gap-1 shrink-0">
+                              <Check size={10} /> Already in Tree
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500">{m.phone_number}</p>
                       </div>
                     </div>

@@ -78,11 +78,12 @@ function LoginOtpComponent() {
 
       const verifyFn = isRegisterMode 
         ? authApi.verifyRegisterOtp({ phone_number: phone, otp, community_uuid: communityUuid })
-        : authApi.verifyLoginOtp({ phone_number: phone, otp })
+        : authApi.verifyLoginOtp({ phone_number: phone, otp, community_uuid: communityUuid })
 
       const response = await verifyFn
       
       if (response.data.success) {
+        localStorage.removeItem('is_direct_admin')
         const authData = response.data.data
         if (authData?.token) {
           setToken(authData.token)

@@ -6,18 +6,23 @@ import { ForcedCommunitySwitchModal } from "@/components/common/ForcedCommunityS
 import { UserRemovedNoticeModal } from "@/components/common/UserRemovedNoticeModal"
 import { toast } from "sonner"
 
+import { isDirectAdminSession } from "@/lib/auth"
+
 interface AppLayoutProps {
   children: React.ReactNode
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
+  const isDirectAdmin = isDirectAdminSession()
 
   // Real-time active session polling for forced community switch / removal
   const [forcedSwitchEvent, setForcedSwitchEvent] = React.useState<any>(null)
   const [removedReason, setRemovedReason] = React.useState<string | null>(null)
 
   React.useEffect(() => {
+    if (isDirectAdmin) return
+
     const checkSessionStatus = async () => {
       try {
         const res = await globalAdminApi.getSessionStatus()
@@ -54,16 +59,18 @@ export function AppLayout({ children }: AppLayoutProps) {
     checkSessionStatus()
     const interval = setInterval(checkSessionStatus, 4000)
     return () => clearInterval(interval)
-  }, [])
+  }, [isDirectAdmin])
 
   return (
     <div className="flex h-screen w-full bg-gray-50 font-sans overflow-hidden">
       <AppHeader onMenuClick={() => setSidebarOpen(true)} />
       
-      <AppSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
+      {!isDirectAdmin && (
+        <AppSidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+        />
+      )}
       
       <main className="flex-1 w-full h-full overflow-y-auto pt-[60px]">
         <div className="p-4 md:p-6 lg:p-8 min-h-full">

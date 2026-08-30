@@ -71,6 +71,7 @@ export interface RegisterRequest {
 export interface OtpVerifyRequest {
   phone_number: string;
   otp: string;
+  community_uuid?: string;
 }
 
 export interface AuthResponse {

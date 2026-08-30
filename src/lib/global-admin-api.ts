@@ -94,19 +94,4 @@ export const globalAdminApi = {
     const res = await api.post('/api/global-admin/acknowledge-switch', data);
     return res.data;
   },
-
-  getChatMessages: async (phone_number: string) => {
-    const res = await api.get(`/api/global-admin/chat-messages?phone_number=${phone_number}`);
-    return res.data;
-  },
-
-  sendChatMessage: async (data: {
-    phone_number: string;
-    sender_name: string;
-    message: string;
-    is_from_admin?: boolean;
-  }) => {
-    const res = await api.post('/api/global-admin/send-chat-message', data);
-    return res.data;
-  },
 };

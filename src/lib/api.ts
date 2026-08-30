@@ -11,6 +11,18 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    const communityDataStr = localStorage.getItem('communityData');
+    if (communityDataStr) {
+      try {
+        const comm = JSON.parse(communityDataStr);
+        if (comm.community_uuid) {
+          config.headers['x-community-uuid'] = comm.community_uuid;
+        }
+        if (comm.community_id) {
+          config.headers['x-community-id'] = String(comm.community_id);
+        }
+      } catch (e) {}
+    }
     return config;
   },
   (error) => {

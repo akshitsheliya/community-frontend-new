@@ -50,6 +50,10 @@ function DashboardItem({ icon: Icon, label, onClick, badge }: { icon: any, label
 function DashboardComponent() {
   const navigate = useNavigate()
   
+  React.useEffect(() => {
+    localStorage.removeItem('is_direct_admin');
+  }, []);
+
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
   const isAdmin = userData.is_community_admin === 1;
   const isCommittee = userData.is_committee_member === 1 || isAdmin;

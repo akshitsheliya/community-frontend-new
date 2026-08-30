@@ -37,10 +37,36 @@ export const setUserData = (user: any): void => {
   localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
 };
 
+export const isDirectAdminSession = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  if (localStorage.getItem('is_direct_admin') === 'true') return true;
+
+  // Check if communityData is a dummy global-admin marker
+  const communityStr = localStorage.getItem('communityData');
+  if (communityStr) {
+    try {
+      const comm = JSON.parse(communityStr);
+      if (comm.community_uuid === 'global-admin-uuid') return true;
+    } catch (e) {}
+  }
+  return false;
+};
+
+export const setDirectAdminSession = (isDirect: boolean): void => {
+  if (typeof window === 'undefined') return;
+  if (isDirect) {
+    localStorage.setItem('is_direct_admin', 'true');
+  } else {
+    localStorage.removeItem('is_direct_admin');
+  }
+};
+
 export const logout = (): void => {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_DATA_KEY);
+  localStorage.removeItem('is_global_admin');
+  localStorage.removeItem('is_direct_admin');
   localStorage.clear();
   sessionStorage.clear();
   window.location.href = '/community';

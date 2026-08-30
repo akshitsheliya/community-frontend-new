@@ -45,6 +45,8 @@ function CommunitySelectionComponent() {
   }, [])
 
   const selectCommunity = (community: Community) => {
+    localStorage.removeItem('is_direct_admin')
+    localStorage.removeItem('is_global_admin')
     localStorage.setItem('communityData', JSON.stringify({
       community_uuid: community.community_uuid,
       community_name: community.community_name,
@@ -103,6 +105,7 @@ function CommunitySelectionComponent() {
       localStorage.setItem('authToken', token)
       localStorage.setItem('token', token)
       localStorage.setItem('is_global_admin', 'true')
+      localStorage.setItem('is_direct_admin', 'true')
       localStorage.setItem('userData', JSON.stringify({
         phone_number: '9999900001',
         first_name: 'Rajesh',
@@ -110,13 +113,11 @@ function CommunitySelectionComponent() {
         is_global_admin: true,
         is_community_admin: 1
       }))
-      if (!localStorage.getItem('communityData')) {
-        localStorage.setItem('communityData', JSON.stringify({
-          community_uuid: 'global-admin-uuid',
-          community_name: 'Global Community Management',
-          community_number: 1,
-        }))
-      }
+      localStorage.setItem('communityData', JSON.stringify({
+        community_uuid: 'global-admin-uuid',
+        community_name: 'Global Admin Portal',
+        community_number: 1,
+      }))
       toast.success('Welcome Rajesh Patel! Global Admin Authenticated!')
       setShowAdminLogin(false)
       window.location.href = '/global-admin/'

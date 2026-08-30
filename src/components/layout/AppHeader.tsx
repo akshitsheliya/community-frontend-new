@@ -6,7 +6,8 @@ import { matcherApi } from '@/lib/family-matcher-api'
 import { notificationApi } from '@/lib/notifications-api'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { AdminChatWidget } from '@/components/common/AdminChatWidget'
+
+import { isDirectAdminSession } from '@/lib/auth'
 
 interface AppHeaderProps {
   onMenuClick: () => void
@@ -15,9 +16,11 @@ interface AppHeaderProps {
 export function AppHeader({ onMenuClick }: AppHeaderProps) {
   const navigate = useNavigate();
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+  const communityData = JSON.parse(localStorage.getItem('communityData') || '{}');
+  const isDirectAdmin = isDirectAdminSession();
   const isAdmin = userData.is_community_admin === 1;
   const isGlobalAdmin = localStorage.getItem('is_global_admin') === 'true';
-  const isAuthenticated = !isGlobalAdmin && !!localStorage.getItem('authToken');
+  const isAuthenticated = !isDirectAdmin && !isGlobalAdmin && !!localStorage.getItem('authToken');
   
   // Fetch incoming join requests count
   const { data: incomingRequests = [] } = useQuery({
@@ -55,34 +58,40 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
   
   return (
     <header className="fixed top-0 left-0 right-0 h-[60px] bg-white border-b border-gray-200 z-40 flex items-center px-4 shadow-sm">
-      <button 
-        onClick={onMenuClick} 
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        aria-label="Toggle Menu"
-      >
-        <Menu size={24} className="text-[#A32328]" />
-      </button>
+      {!isDirectAdmin && (
+        <button 
+          onClick={onMenuClick} 
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors mr-2"
+          aria-label="Toggle Menu"
+        >
+          <Menu size={24} className="text-[#A32328]" />
+        </button>
+      )}
       
-      <h1 className="ml-4 font-semibold text-gray-800 text-lg truncate flex-1">
-        Umarala Gam Samast Leuva Patel Samaj
+      <h1 className="font-semibold text-gray-800 text-lg truncate flex-1 flex items-center gap-2">
+        {isDirectAdmin ? (
+          <span className="text-[#A32328] font-bold">Global Admin Control Center</span>
+        ) : (
+          <span>{communityData.community_name || 'Umarala Gam Samast Leuva Patel Samaj'}</span>
+        )}
       </h1>
       
-      <div className="ml-auto flex items-center gap-2">
-        <AdminChatWidget />
-        
-        <button 
-          onClick={handleBellClick}
-          className="p-2 hover:bg-gray-100 rounded-lg relative transition-colors" 
-          aria-label="Notifications"
-        >
-          <Bell size={22} className="text-[#A32328]" />
-          {totalNotifications > 0 && (
-            <span className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-              {totalNotifications > 9 ? '9+' : totalNotifications}
-            </span>
-          )}
-        </button>
-      </div>
+      {!isDirectAdmin && (
+        <div className="ml-auto flex items-center gap-2">
+          <button 
+            onClick={handleBellClick}
+            className="p-2 hover:bg-gray-100 rounded-lg relative transition-colors" 
+            aria-label="Notifications"
+          >
+            <Bell size={22} className="text-[#A32328]" />
+            {totalNotifications > 0 && (
+              <span className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                {totalNotifications > 9 ? '9+' : totalNotifications}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
     </header>
   )
 }
